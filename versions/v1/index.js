@@ -1,22 +1,15 @@
 const Router = require('koa-router')
-const setValidators = require('koa-async-validator')
-
-const configs = require('../../configs')
-const logger = require('../../server/utils/logger')
-
-const schemas = require('./src/utils/schemas')
-const { messages } = require('./src/utils/error')
 const services = require('./src/services')
 
 const createRouter = () => {
   const router = new Router()
 
-  setRoutes(router, { validate, authenticate })
+  setRoutes(router)
 
   return router
 }
 
-const setRoutes = (router, { validate, authenticate }) => {
+const setRoutes = (router) => {
   const { health, contacts } = services
 
   router.get('/health', health.get)

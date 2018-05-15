@@ -3,11 +3,15 @@ const lib = require('../lib')
 
 const list = async ctx => {
   const peoples = lib.People.list()
+  console.log(peoples)
+  if (peoples) {
+    peoples.forEach(people => {
+      people.Contacts = lib.Contact.listContact(people.idPeople)
+    })
+    ctx.body = peoples
+  }
 
-  peoples.forEach(people => {
-    people.Contacts = lib.Contact.listContact(people.idPeople)
-  })
-  ctx.body = peoples
+  ctx.body = {}
 }
 
 const remove = async ctx => {
@@ -21,9 +25,14 @@ const remove = async ctx => {
 
 const get = async ctx => {
   const { idPeople } = ctx.request.body
-  const people = lib.People.findPeople(idPeople)
-  people.Contacts = lib.Contact.listContact(people.idPeople)
-  ctx.body = people
+
+  if (!idPeople) {
+    ctx.body = {}
+  } else {
+    const people = lib.People.findPeople(idPeople)
+    people.Contacts = lib.Contact.listContact(people.idPeople)
+    ctx.body = people
+  }
 }
 
 const insert = async ctx => {
