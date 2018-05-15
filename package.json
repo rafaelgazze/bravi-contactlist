@@ -1,0 +1,90 @@
+{
+  "name": "bravi-contactlist",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "npm run sequelize-migrate; node server/index.js",
+    "config:dev": "cp configs/config-vars.dev.json server/config-vars.json",
+    "test": "npm run config:test; npm run sequelize-migrate; bash -c 'for v in ./versions/v* ; do (echo \"=== Running $v tests ===\"; NODE_ENV=test mocha --require $v/test/helpers \"$v/**/*@(.spec.js)\" --timeout 2000); done'",
+    "sequelize-migrate": "bash -c 'for folder in ./versions/*/ ; do cd $folder && ../../node_modules/.bin/sequelize db:migrate --env sequelize_db; cd -; done'",
+    "lint": "eslint ./versions/*/src ./server --ext .js --ext .json --fix",
+    "cover": "rm -rf versions/*/lcov-report; rm -rf versions/*/out; nyc npm test",
+    "dev:debug": "npm run config:dev; npm run sequelize-migrate; nodemon --inspect server/index.js",
+    "dev": "npm run config:dev; npm run sequelize-migrate; nodemon server/index.js",
+    "sequelize-revert": "bash -c 'lf=(./versions/*/); n=${#lf[@]}; for ((i=$n-1;i>=0;i--)); do folder=${lf[$i]}; cd $folder && ../../node_modules/.bin/sequelize db:migrate:undo --env sequelize_db; cd -; done'"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@koa/cors": "^2.2.1",
+    "bluebird": "^3.5.1",
+    "bristol": "^0.3.3",
+    "jsonwebtoken": "^8.1.1",
+    "koa": "^2.0.0",
+    "koa-async-validator": "^0.1.2",
+    "koa-bodyparser": "^3.2.0",
+    "koa-router": "^7.0.1",
+    "moment-timezone": "^0.5.13",
+    "mysql2": "^1.5.2",
+    "palin": "^2.1.1",
+    "request": "^2.83.0",
+    "request-promise": "^4.2.2",
+    "require-all": "^2.1.0",
+    "rootpath": "^0.1.2",
+    "sequelize": "^4.35.2",
+    "sequelize-cli": "^3.2.0"
+  },
+  "pre-commit": [
+    "lint",
+    "test"
+  ],
+  "devDependencies": {
+    "chai": "^4",
+    "chai-as-promised": "^7",
+    "cross-env": "^5.0.5",
+    "docdash": "^0.4.0",
+    "dotenv": "^4.0.0",
+    "eslint": "^4.18.2",
+    "eslint-config-standard": "^6.2.1",
+    "eslint-plugin-json": "^1.2.0",
+    "eslint-plugin-promise": "^3.5.0",
+    "eslint-plugin-standard": "^2.3.1",
+    "eslint-watch": "^2.1.14",
+    "faker": "^4.1.0",
+    "mocha": "^3.5.3",
+    "mocha-jenkins-reporter": "^0.3.6",
+    "nock": "^9.0.14",
+    "nodemon": "^1.11.0",
+    "nyc": "^10.1.2",
+    "pre-commit": "^1.2.2",
+    "proxyquire": "^1.8.0",
+    "sinon": "^1.17.7",
+    "sinon-chai": "^2.13.0",
+    "sqlite3": "^3.1.13",
+    "supertest": "^3.0.0"
+  },
+  "nyc": {
+    "sourceMap": false,
+    "instrument": true,
+    "cache": false,
+    "reporter": [
+      "text",
+      "lcov",
+      "cobertura"
+    ],
+    "require": [
+      "babel-register"
+    ],
+    "include": [
+      "versions/v.*/**/*.js"
+    ],
+    "exclude": [
+      "versions/v.*/db/migrations",
+      "versions/v.*/test/**/*",
+      "versions/out/**/*",
+      "versions/lcov-report/**/*",
+      "server/utils"
+    ]
+  }
+}
